@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A³ FinCanvas – Smart Budget Planner</title>
+<meta name="description" content="Track spending, set budget caps, chase savings goals and test purchases with the What-If simulator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="fx.css">
+<script>
+  // Apply saved theme before first paint to avoid a flash
+  try {
+    var t = localStorage.getItem('fincanvas.theme');
+    if (!t) t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+</head>
+<body>
+<a class="skip" href="#view">Skip to content</a>
+
+<!-- ============ AUTH ============ -->
+<div id="auth" class="auth" hidden>
+  <section class="auth-hero">
+    <div class="brand"><span class="logo">₹</span><div><strong>A³ FinCanvas</strong><small>Built for students &amp; professionals</small></div></div>
+    <h1>Take control of every rupee you earn.</h1>
+    <p>Track spending, set budget caps, chase savings goals and test purchases with the What-If simulator — all in one clear dashboard.</p>
+    <ul class="hero-points">
+      <li><span>✓</span> One clear number: <b>Available to spend</b></li>
+      <li><span>✓</span> Savings goals that really set money aside</li>
+      <li><span>✓</span> Backup &amp; restore your data any time</li>
+    </ul>
+    <div class="hero-card" aria-hidden="true">
+      <div><small>Goal · New Laptop</small><strong>₹42,000 / ₹60,000</strong></div>
+      <div class="bar"><i style="width:70%"></i></div>
+      <svg class="hero-spark" viewBox="0 0 300 46" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="fxSparkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+        <path class="area" d="M0 40 C30 38 45 30 70 32 S115 22 140 24 S190 12 215 15 S270 5 296 6 L296 46 L0 46 Z"/>
+        <path class="line" d="M0 40 C30 38 45 30 70 32 S115 22 140 24 S190 12 215 15 S270 5 296 6"/>
+        <circle cx="296" cy="6" r="4"/>
+      </svg>
+    </div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="card auth-card">
+      <h2 id="authTitle">Welcome back 👋</h2>
+      <p class="muted" id="authSub">Log in to continue to your dashboard.</p>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" class="tab on" data-auth-tab="login" aria-selected="true">Log in</button>
+        <button type="button" role="tab" class="tab" data-auth-tab="signup" aria-selected="false">Sign up</button>
+      </div>
+      <form id="authForm" novalidate>
+        <div class="field signup-only" hidden>
+          <label for="a_name">Full name</label>
+          <input id="a_name" name="name" type="text" autocomplete="name">
+          <p class="err" data-for="name" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="a_email">Email</label>
+          <input id="a_email" name="email" type="email" autocomplete="email" inputmode="email">
+          <p class="err" data-for="email" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="a_pw">Password</label>
+          <input id="a_pw" name="password" type="password" autocomplete="current-password">
+          <p class="hint signup-only" hidden>At least 8 characters with a letter and a number. This password also encrypts your data and <b>can’t be reset</b>: if you forget it, your data can’t be recovered.</p>
+          <p class="err" data-for="password" role="alert"></p>
+        </div>
+        <fieldset class="field signup-only" hidden>
+          <legend>I am a…</legend>
+          <div class="seg">
+            <label><input type="radio" name="mode" value="student" checked><span>🎓 Student</span></label>
+            <label><input type="radio" name="mode" value="professional"><span>💼 Professional</span></label>
+          </div>
+        </fieldset>
+        <button type="submit" class="btn primary block" id="authBtn">Log in</button>
+      </form>
+      <div class="or"><span>OR</span></div>
+      <button type="button" class="btn ghost block" id="demoBtn">Try the demo account</button>
+      <p class="fine">🔒 Your data is stored only in this browser and encrypted with your password (the demo account is not encrypted). 🧪 <b>Prototype:</b> not a replacement for a secure server — never enter card numbers, PINs or OTPs.</p>
+    </div>
+    <p class="credit">Crafted by A³ Webworks</p>
+  </section>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" class="app" hidden>
+  <aside class="side">
+    <div class="brand"><span class="logo">₹</span><div><strong>A³ FinCanvas</strong><small>by A³ Webworks</small></div></div>
+    <nav id="sideNav" aria-label="Main"></nav>
+    <div class="side-foot">
+      <div class="who"><span class="avatar" id="avatar">U</span><div><strong id="whoName">User</strong><small id="whoMode">Student</small></div></div>
+      <button class="btn ghost sm block" data-action="logout">Log out</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <h1 id="viewTitle">Dashboard</h1>
+      <div class="top-actions">
+        <label class="sr" for="period">Time period</label>
+        <select id="period" class="select"></select>
+        <button class="icon-btn" data-action="theme" aria-label="Toggle dark mode" title="Toggle dark mode">🌓</button>
+        <button class="btn primary" data-action="add-txn"><span aria-hidden="true">＋</span> Add</button>
+      </div>
+    </header>
+    <main id="view" tabindex="-1"></main>
+  </div>
+
+  <nav class="bottom" id="bottomNav" aria-label="Main (mobile)"></nav>
+</div>
+
+<dialog id="modal"></dialog>
+<dialog id="confirm"></dialog>
+<div id="toast" aria-live="polite"></div>
+<input type="file" id="file" accept=".json,application/json" hidden>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="fx.js"></script>
+<script src="calculations.js"></script>
+<script src="storage.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

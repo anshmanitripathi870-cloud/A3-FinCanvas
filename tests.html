@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FinCanvas tests</title>
+<style>body{font:15px/1.5 system-ui,sans-serif;max-width:760px;margin:24px auto;padding:0 16px}.p{color:#047857}.f{color:#b91c1c;font-weight:700}h1{margin-bottom:4px}#sum{font-weight:700;margin:12px 0}</style></head>
+<body><h1>A³ FinCanvas — calculation tests</h1><p>Runs the same checks as <code>node tests/run.js</code>.</p><div id="sum"></div><div id="out"></div>
+<script src="calculations.js"></script><script src="tests/calculations.test.js"></script>
+<script>
+var out = document.getElementById('out');
+var r = runFinCanvasTests(Calc, function (ok, name, msg) {
+  var d = document.createElement('div'); d.className = ok ? 'p' : 'f';
+  d.textContent = (ok ? '✓ ' : '✗ ') + name + (msg ? ' — ' + msg : ''); out.appendChild(d);
+});
+document.getElementById('sum').textContent = r.passed + ' passed, ' + r.failed + ' failed';
+</script></body></html>
